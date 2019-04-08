@@ -4,9 +4,14 @@ from abc import ABC
 from abc import abstractmethod
 from base64 import b32encode
 from hashlib import sha1
+from hashlib import sha3_256
+from hashlib import sha512
 from typing import BinaryIO
 
 from Crypto.PublicKey import RSA
+from Crypto.Random import get_random_bytes
+
+from .ed25519 import Ed25519
 
 
 __all__ = [
@@ -196,4 +201,96 @@ class OnionV3(Onion):
     Tor onion address v3 implement
     '''
 
+    _header_priv = b'== ed25519v1-secret: type0 ==\x00\x00\x00'
+    _header_pub = b'== ed25519v1-public: type0 ==\x00\x00\x00'
+
+    _test = False
+
     _version = 3
+
+    def _save_keypair(self, key: bytes) -> None:
+        self._priv = key
+        self._pub = Ed25519().public_key_from_byte_key(key)
+
+    def gen_new_private_key(self) -> None:
+        'Generate new tor ed25519 512 bits key'
+        random = get_random_bytes(32)
+        key = bytearray(sha512(random).digest())
+        key[0] &= 248
+        key[31] &= 63
+        key[31] |= 64
+        self._save_keypair(bytes(key))
+
+    def set_private_key(self, key: bytes) -> None:
+        'Add private key'
+        if not key.startswith(self._header_priv):
+            raise Exception(
+                'Private key does not seems to be a valid ed25519 tor key'
+            )
+        parsed_key = key[32:]
+        if len(parsed_key) != 64:
+            raise Exception(
+                'Private key does not seem to have the good lenght'
+            )
+        self._save_keypair(parsed_key)
+
+    def set_private_key_from_file(self, file: BinaryIO):
+        'Load private key from file'
+        self.set_private_key(file.read())
+
+    def _get_private_key_has_native(self) -> bytes:
+        'Get RSA private key like in PEM'
+        return self._header_priv + self._priv
+
+    def get_public_key(self) -> bytes:
+        'Compute public key'
+        super().get_public_key()
+        return self._header_pub + self._pub
+
+    def load_hidden_service(self, path: str) -> None:
+        if not os.path.isdir(path):
+            raise Exception(
+                '{path} should be an existing directory'.format(path=path)
+            )
+        if 'hs_ed25519_secret_key' not in os.listdir(path):
+            raise EmptyDirException(
+                'hs_ed25519_secret_key file not found in {path}'.format(
+                    path=path
+                )
+            )
+        with open(os.path.join(path, 'hs_ed25519_secret_key'), 'rb') as f:
+            self.set_private_key_from_file(f)
+
+    def write_hidden_service(self, path: str = None,
+                             force: bool = False) -> None:
+        path = path or self._hidden_service_path
+        if not path:
+            raise Exception('Missing hidden service path')
+        if not os.path.exists(path):
+            raise Exception(
+                '{path} should be an existing directory'.format(path=path)
+            )
+        if os.path.exists(os.path.join(path, 'private_key')) and not force:
+            raise Exception(
+                'Use force=True for non empty hidden service directory'
+            )
+        with open(os.path.join(path, 'hs_ed25519_secret_key'), 'wb') as f:
+            f.write(self._get_private_key_has_native())
+        with open(os.path.join(path, 'hs_ed25519_public_key'), 'wb') as f:
+            f.write(self.get_public_key())
+        with open(os.path.join(path, 'hostname'), 'w') as f:
+            f.write(self.onion_address)
+
+    def get_onion_str(self) -> str:
+        'Compute onion address string'
+        version_byte = b'\x03'
+
+        def checksum(pubkey):
+            checksum_str = '.onion checksum'.encode('ascii')
+            return sha3_256(
+                checksum_str + self._pub + version_byte
+            ).digest()[:2]
+
+        return b32encode(
+            self._pub + checksum(self._pub) + version_byte
+        ).decode().lower()
