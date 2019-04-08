@@ -41,9 +41,6 @@ class Ed25519():
     def as_key(self, h):
         return 2**(self.length - 2) + (self.from_bytes(h) & key_mask)
 
-    def to_num(self, h):
-        return 2**(self.length - 2) + (self.from_bytes(h))
-
     def secret_key(self):
         """ pick a random secret key """
         m = os.urandom(1024)
@@ -60,7 +57,7 @@ class Ed25519():
         return self.point_to_bytes(c)
 
     def public_key_from_byte_key(self, hash):
-        c = self.outer(self.B, self.to_num(hash))
+        c = self.outer(self.B, int.from_bytes(hash[:32], 'little'))
         return self.point_to_bytes(c)
 
     def inverse(self, x):
@@ -119,8 +116,10 @@ class Ed25519():
 
     def inner(self, P, Q):
         """ inner product on the curve, between two points """
-        x = (P.x * Q.y + Q.x * P.y) * self.inverse(1 + self.d * P.x * Q.x * P.y * Q.y)
-        y = (P.y * Q.y + P.x * Q.x) * self.inverse(1 - self.d * P.x * Q.x * P.y * Q.y)
+        x = (P.x * Q.y + Q.x * P.y) * \
+            self.inverse(1 + self.d * P.x * Q.x * P.y * Q.y)
+        y = (P.y * Q.y + P.x * Q.x) * \
+            self.inverse(1 - self.d * P.x * Q.x * P.y * Q.y)
         return Point(x % self.q, y % self.q)
 
     def outer(self, P, n):
