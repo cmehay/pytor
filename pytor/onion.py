@@ -32,6 +32,9 @@ class Onion(ABC):
     _priv = None
     _pub = None
     _hidden_service_path = None
+    _priv_key_filename = None
+    _pub_key_filename = None
+    _host_filename = None
     _version = None
 
     def __init__(self,
@@ -54,10 +57,9 @@ class Onion(ABC):
         'Generate new private key'
         ...
 
-    @abstractmethod
     def set_private_key_from_file(self, file: BinaryIO):
         'Load private key from file'
-        ...
+        self.set_private_key(file.read())
 
     @abstractmethod
     def set_private_key(self, key: bytes) -> None:
@@ -69,15 +71,37 @@ class Onion(ABC):
         'Generate pub key from priv key and save both in instance'
         ...
 
-    @abstractmethod
     def load_hidden_service(self, path: str) -> None:
-        'Load key from hidden service'
-        ...
+        if not os.path.isdir(path):
+            raise Exception(
+                '{path} should be an existing directory'.format(path=path)
+            )
+        if self._priv_key_filename not in os.listdir(path):
+            raise EmptyDirException(
+                'private_key file not found in {path}'.format(path=path)
+            )
+        with open(os.path.join(path, self._priv_key_filename), 'rb') as f:
+            self.set_private_key_from_file(f)
 
-    @abstractmethod
-    def write_hidden_service(self, path: str, force: bool = False) -> None:
-        'Write hidden service keys to directory'
-        ...
+    def write_hidden_service(self, path: str = None,
+                             force: bool = False) -> None:
+        path = path or self._hidden_service_path
+        if not path:
+            raise Exception('Missing hidden service path')
+        if not os.path.exists(path):
+            raise Exception(
+                '{path} should be an existing directory'.format(path=path)
+            )
+        if os.path.exists(
+            os.path.join(path, self._priv_key_filename)
+        ) and not force:
+            raise Exception(
+                'Use force=True for non empty hidden service directory'
+            )
+        with open(os.path.join(path, self._priv_key_filename), 'wb') as f:
+            f.write(self._get_private_key_has_native())
+        with open(os.path.join(path, self._host_filename), 'w') as f:
+            f.write(self.onion_hostname)
 
     def get_available_private_key_formats(self) -> list:
         'Get private key export availables formats'
@@ -115,7 +139,7 @@ class Onion(ABC):
         ...
 
     @property
-    def onion_address(self) -> str:
+    def onion_hostname(self) -> str:
         return "{onion}.onion".format(
             onion=self.get_onion_str()
         )
@@ -129,6 +153,8 @@ class OnionV2(Onion):
     '''
     Tor onion address v2 implement
     '''
+    _priv_key_filename = 'private_key'
+    _host_filename = 'hostname'
 
     _version = 2
 
@@ -144,10 +170,6 @@ class OnionV2(Onion):
         'Add private key'
         self._save_keypair(RSA.importKey(key.strip()))
 
-    def set_private_key_from_file(self, file: BinaryIO):
-        'Load private key from file'
-        self.set_private_key(file.read())
-
     def _get_private_key_has_native(self) -> bytes:
         'Get RSA private key like in PEM'
         return self._get_private_key_has_pem()
@@ -160,36 +182,6 @@ class OnionV2(Onion):
         'Compute public key'
         super().get_public_key()
         return self._pub
-
-    def load_hidden_service(self, path: str) -> None:
-        if not os.path.isdir(path):
-            raise Exception(
-                '{path} should be an existing directory'.format(path=path)
-            )
-        if 'private_key' not in os.listdir(path):
-            raise EmptyDirException(
-                'private_key file not found in {path}'.format(path=path)
-            )
-        with open(os.path.join(path, 'private_key'), 'rb') as f:
-            self.set_private_key_from_file(f)
-
-    def write_hidden_service(self, path: str = None,
-                             force: bool = False) -> None:
-        path = path or self._hidden_service_path
-        if not path:
-            raise Exception('Missing hidden service path')
-        if not os.path.exists(path):
-            raise Exception(
-                '{path} should be an existing directory'.format(path=path)
-            )
-        if os.path.exists(os.path.join(path, 'private_key')) and not force:
-            raise Exception(
-                'Use force=True for non empty hidden service directory'
-            )
-        with open(os.path.join(path, 'private_key'), 'wb') as f:
-            f.write(self._get_private_key_has_native())
-        with open(os.path.join(path, 'hostname'), 'w') as f:
-            f.write(self.onion_address)
 
     def get_onion_str(self) -> str:
         'Compute onion address string'
@@ -204,7 +196,9 @@ class OnionV3(Onion):
     _header_priv = b'== ed25519v1-secret: type0 ==\x00\x00\x00'
     _header_pub = b'== ed25519v1-public: type0 ==\x00\x00\x00'
 
-    _test = False
+    _priv_key_filename = 'hs_ed25519_secret_key'
+    _pub_key_filename = 'hs_ed25519_public_key'
+    _host_filename = 'hostname'
 
     _version = 3
 
@@ -247,39 +241,12 @@ class OnionV3(Onion):
         super().get_public_key()
         return self._header_pub + self._pub
 
-    def load_hidden_service(self, path: str) -> None:
-        if not os.path.isdir(path):
-            raise Exception(
-                '{path} should be an existing directory'.format(path=path)
-            )
-        if 'hs_ed25519_secret_key' not in os.listdir(path):
-            raise EmptyDirException(
-                'hs_ed25519_secret_key file not found in {path}'.format(
-                    path=path
-                )
-            )
-        with open(os.path.join(path, 'hs_ed25519_secret_key'), 'rb') as f:
-            self.set_private_key_from_file(f)
-
     def write_hidden_service(self, path: str = None,
                              force: bool = False) -> None:
         path = path or self._hidden_service_path
-        if not path:
-            raise Exception('Missing hidden service path')
-        if not os.path.exists(path):
-            raise Exception(
-                '{path} should be an existing directory'.format(path=path)
-            )
-        if os.path.exists(os.path.join(path, 'private_key')) and not force:
-            raise Exception(
-                'Use force=True for non empty hidden service directory'
-            )
-        with open(os.path.join(path, 'hs_ed25519_secret_key'), 'wb') as f:
-            f.write(self._get_private_key_has_native())
-        with open(os.path.join(path, 'hs_ed25519_public_key'), 'wb') as f:
+        super().write_hidden_service(path, force)
+        with open(os.path.join(path, self._pub_key_filename), 'wb') as f:
             f.write(self.get_public_key())
-        with open(os.path.join(path, 'hostname'), 'w') as f:
-            f.write(self.onion_address)
 
     def get_onion_str(self) -> str:
         'Compute onion address string'
