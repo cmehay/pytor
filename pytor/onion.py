@@ -204,7 +204,7 @@ class OnionV3(Onion):
 
     def _save_keypair(self, key: bytes) -> None:
         self._priv = key
-        self._pub = Ed25519().public_key_from_byte_key(key)
+        self._pub = Ed25519().public_key_from_hash(key)
 
     def gen_new_private_key(self) -> None:
         'Generate new tor ed25519 512 bits key'
