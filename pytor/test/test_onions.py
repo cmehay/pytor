@@ -21,7 +21,7 @@ class _testOnion:
         o = self.onion_cls(private_key=self.private_key)
         assert o.get_public_key() == self.public_key
         assert o.onion_address == self.onion_address
-        assert o.get_private_key() == self.private_key.encode()
+        assert o.get_private_key() == self.private_key
 
     def test_generate_key(self):
         o = self.onion_cls()
@@ -39,7 +39,7 @@ class _testOnion:
     def test_import_hidden_directory(self, tmpdir):
         d = tmpdir.mkdir("hidden_directory")
         f = d.join('private_key')
-        f.write(self.private_key)
+        f.write_binary(self.private_key)
         o = self.onion_cls(hidden_service_path=d)
         assert o.onion_address == self.onion_address
 
@@ -47,7 +47,7 @@ class _testOnion:
         d = tmpdir.mkdir("hidden_directory")
         o = self.onion_cls(private_key=self.private_key)
         o.write_hidden_service(path=str(d))
-        assert d.join('private_key').read() == self.private_key
+        assert d.join('private_key').read() == self.private_key.decode()
         assert d.join('hostname').read() == o.onion_address
 
     def test_import_empty_hidden_directory(self, tmpdir):
@@ -60,7 +60,7 @@ class _testOnion:
     def test_import_hidden_directory_with_new_key(self, tmpdir):
         d = tmpdir.mkdir("hidden_directory")
         f = d.join('private_key')
-        f.write(self.generate_new_key())
+        f.write_binary(self.generate_new_key())
         o = self.onion_cls(hidden_service_path=d,
                            private_key=self.private_key)
         with pytest.raises(Exception):
@@ -91,7 +91,7 @@ l5MQPWBkRKK2pc2Hfj8cdIMi8kJ/1CyCwE6c5l8etR3sbIMRTtZ76nAbXRFkmsRv
 La/7Syrnobngsh/vX90CQB+PSSBqiPSsK2yPz6Gsd6OLCQ9sdy2oRwFTasH8sZyl
 bhJ3M9WzP/EMkAzyW8mVs1moFp3hRcfQlZHl6g1U9D8=
 -----END RSA PRIVATE KEY-----
-    '''.strip()
+    '''.strip().encode()
 
     public_key = b64decode('''
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCsMP4gl6g1Q313miPhb1GnDr56
@@ -101,6 +101,11 @@ Ch5OTBuvMLzQ8W0yDwIDAQAB
     ''')
     onion_address = 'wcet3bgkj4purdfx.onion'
     onion_cls = OnionV2
+    files_in_hidden_dir = {
+        'priv': 'private_key',
+        'pub': None,
+        'onion': 'hostname',
+    }
     version = 2
 
 
@@ -121,4 +126,9 @@ m9/hW13isA==
     )
 
     onion_cls = OnionV3
+    files_in_hidden_dir = {
+        'priv': 'hs_ed25519_secret_key',
+        'pub': 'hs_ed25519_public_key',
+        'onion': 'hostname',
+    }
     version = 3
