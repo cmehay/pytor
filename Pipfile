@@ -15,6 +15,7 @@ autopep8 = "*"
 [packages]
 pycryptodome = "*"
 numpy = "*"
+pytor = {path = "."}
 
 [requires]
 python_version = "3"
