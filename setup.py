@@ -6,7 +6,7 @@ from setuptools import setup
 setup(
     name='pytor',
 
-    version='0.1.0',
+    version='0.1.1',
 
     packages=find_packages(),
 
@@ -27,8 +27,6 @@ setup(
         "Natural Language :: English",
         "Operating System :: POSIX :: Linux",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
     ],
