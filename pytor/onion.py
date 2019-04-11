@@ -3,6 +3,7 @@ import re
 from abc import ABC
 from abc import abstractmethod
 from base64 import b32encode
+from base64 import b64encode
 from hashlib import sha1
 from hashlib import sha3_256
 from hashlib import sha512
@@ -17,10 +18,16 @@ from .ed25519 import Ed25519
 __all__ = [
     'OnionV2',
     'OnionV3',
+    'EmptyDirException',
+    'NonEmptyDirException',
 ]
 
 
 class EmptyDirException(Exception):
+    pass
+
+
+class NonEmptyDirException(Exception):
     pass
 
 
@@ -92,10 +99,12 @@ class Onion(ABC):
             raise Exception(
                 '{path} should be an existing directory'.format(path=path)
             )
-        if os.path.exists(
+        if (os.path.exists(
+            os.path.join(path, self._host_filename)
+        ) or os.path.exists(
             os.path.join(path, self._priv_key_filename)
-        ) and not force:
-            raise Exception(
+        )) and not force:
+            raise NonEmptyDirException(
                 'Use force=True for non empty hidden service directory'
             )
         with open(os.path.join(path, self._priv_key_filename), 'wb') as f:
@@ -187,6 +196,12 @@ class OnionV2(Onion):
         'Compute onion address string'
         return b32encode(sha1(self._pub[22:]).digest()[:10]).decode().lower()
 
+    def serialize(self):
+        return {
+            self._host_filename: self.onion_hostname,
+            self._priv_key_filename: self.get_private_key().decode(),
+        }
+
 
 class OnionV3(Onion):
     '''
@@ -261,3 +276,12 @@ class OnionV3(Onion):
         return b32encode(
             self._pub + checksum(self._pub) + version_byte
         ).decode().lower()
+
+    def serialize(self):
+        return {
+            self._host_filename: self.onion_hostname,
+            self._priv_key_filename: b64encode(
+                self.get_private_key()).decode(),
+            self._pub_key_filename: b64encode(
+                self.get_public_key()).decode(),
+        }

@@ -6,7 +6,7 @@ from setuptools import setup
 setup(
     name='pytor',
 
-    version='0.1.1',
+    version='0.1.2',
 
     packages=find_packages(),
 
@@ -33,11 +33,11 @@ setup(
 
     install_requires=['pycryptodome==3.8.1'],
 
-    # entry_points={
-    #     'console_scripts': [
-    #         'pytor = pytor:main',
-    #     ],
-    # },
+    entry_points={
+        'console_scripts': [
+            'pytor = pytor.__main__:main',
+        ],
+    },
 
     license="WTFPL",
 )
