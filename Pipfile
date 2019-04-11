@@ -16,6 +16,7 @@ autopep8 = "*"
 pycryptodome = "*"
 numpy = "*"
 pytor = {path = "."}
+fire = "*"
 
 [requires]
 python_version = "3"
