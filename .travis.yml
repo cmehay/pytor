@@ -1,9 +1,16 @@
 dist: xenial
 language: python
 python:
-  - "3.6"
-  - "3.7"
+- '3.6'
+- '3.7'
 install:
-  - pip install pytest pyfakefs
-  - pip install .
+- pip install pytest pyfakefs
+- pip install .
 script: pytest
+deploy:
+  provider: pypi
+  user: cmehay
+  password:
+    secure: DNYBGvoXcxRNu2mIH4GKvazD6IxkW21ftkihGGFEzll3g1nWV36KPqgZ+2kHN3V69IipI2qe8sa5K3ilZUnNS+WqUU1DdOGzyZq14TPc7tpR1XvVRJokVBEYxTSfnHck7qKvUUcg/7aHNtHR7Fn97l89XvoMiUancCZ6goHHH8R5JfphvF/jg/211Xzl5iRHwGrWDadQCpvxf2PA7yxiUmqglVqbCRu2oox694yS70m2zjr7CNpG7KeRUAWBL1qxM9fnUtlKt3XQ5eGwGuO99f2pmFDPPPHoLyzh9OB1Lue27JWqEotJcS3xTEHg9MhQzWKDYjnUNOX0O7xt7WkakLzkWppZG6SCBrb3Pq7Mimg18T7pCfjwg7TIYqbKiJjiYwg9sIU++wxxMVCHL0fTz8Dbx79L7APR03pVm7mk7GJflSEU2/daMip/SpiBEahLjkpY0573c0RidxY0iHfM+anUMJCVjtHhPcA7jHaupeb7CdHjttFT70aOfUVeHxNk/Y8RWvTJY2pb9lUiigCzyALoy08VRc8OruduLwTYqHZ0zacR0142UrtS1GqiueSyTxRQ0BxA5q2ktfg8jGkp73vvejV19C+B3WiEMtlu4wEQr50lHeQnQc1e+7UcHTiS0vicdaEMexWEADa+v4JDr5epOKRAZ7YIztYr0zJ+TUI=
+  on:
+    tags: true
