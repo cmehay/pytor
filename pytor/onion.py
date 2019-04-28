@@ -85,7 +85,10 @@ class Onion(ABC):
             )
         if self._priv_key_filename not in os.listdir(path):
             raise EmptyDirException(
-                'private_key file not found in {path}'.format(path=path)
+                '{key} file not found in {path}'.format(
+                    key=self._priv_key_filename,
+                    path=path
+                )
             )
         with open(os.path.join(path, self._priv_key_filename), 'rb') as f:
             self.set_private_key_from_file(f)
