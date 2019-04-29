@@ -6,7 +6,7 @@ from setuptools import setup
 setup(
     name='pytor',
 
-    version='0.1.3',
+    version='0.1.4',
 
     packages=find_packages(),
 
