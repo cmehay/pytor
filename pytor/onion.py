@@ -180,6 +180,10 @@ class OnionV2(Onion):
 
     def set_private_key(self, key: bytes) -> None:
         'Add private key'
+        if not key.startswith(b'-----BEGIN RSA PRIVATE KEY-----'):
+            raise Exception(
+                'Private key does not seems to be a valid RSA PEM key'
+            )
         self._save_keypair(RSA.importKey(key.strip()))
 
     def _get_private_key_has_native(self) -> bytes:
