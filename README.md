@@ -1,6 +1,6 @@
 # pytor
 
-`pytor` is a simple python librairy to create and manager tor hidden services in version 2 and 3.
+`pytor` is a simple python library to create and manager tor hidden services in version 2 and 3.
 
 ```sh
 $ pytor new
