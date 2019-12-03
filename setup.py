@@ -6,7 +6,7 @@ from setuptools import setup
 setup(
     name='pytor',
 
-    version='0.1.4',
+    version='0.1.5',
 
     packages=find_packages(),
 
@@ -31,7 +31,7 @@ setup(
         "Programming Language :: Python :: 3.7",
     ],
 
-    install_requires=['pycryptodome==3.8.1'],
+    install_requires=['pycryptodome==3.9.4'],
 
     entry_points={
         'console_scripts': [

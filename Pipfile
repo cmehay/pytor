@@ -17,6 +17,7 @@ pycryptodome = "*"
 numpy = "*"
 pytor = {path = "."}
 fire = "*"
+pyyaml = "*"
 
 [requires]
 python_version = "3"
