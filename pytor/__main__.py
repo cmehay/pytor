@@ -10,13 +10,12 @@ from .onion import OnionV3
 
 
 class Format(object):
-
     def __init__(self, format: str):
-        attr = 'print_{format}'.format(format=format)
+        attr = "print_{format}".format(format=format)
         if not hasattr(self, attr):
-            raise Exception('Output format not valid')
+            raise Exception("Output format not valid")
         self.method = getattr(self, attr)
-        print('FYI: Binary data is base64 encoded', file=sys.stderr)
+        print("FYI: Binary data is base64 encoded", file=sys.stderr)
 
     def print(self, data: dict):
         self.method(data)
@@ -39,9 +38,9 @@ class Pytor(object):
         3: OnionV3,
     }
 
-    def __init__(self, version: int = 2, format: str = 'plain'):
+    def __init__(self, version: int = 2, format: str = "plain"):
         if version not in self._obj:
-            raise Exception('Onion version not valid')
+            raise Exception("Onion version not valid")
         self._version = version
         self._print = Format(format).print
         self._stderr: lambda x: print(x, file=sys.stderr)
@@ -60,18 +59,18 @@ class Pytor(object):
             obj.write_hidden_service(path=path, force=force)
         except NonEmptyDirException:
             s = input(
-                'Dir {path} not empty, override? [Y/n]'.format(path=path)
+                "Dir {path} not empty, override? [Y/n]".format(path=path)
             )
-            if not s or s.lower() == 'y':
+            if not s or s.lower() == "y":
                 obj.write_hidden_service(path=path, force=True)
             else:
-                print('Canceled...')
-        self._print({'path': path, **obj.serialize()})
+                print("Canceled...")
+        self._print({"path": path, **obj.serialize()})
 
 
 def main():
     fire.Fire(Pytor)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
