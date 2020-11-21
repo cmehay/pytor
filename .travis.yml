@@ -1,16 +1,25 @@
-dist: xenial
 language: python
 python:
 - '3.6'
 - '3.7'
-install:
-- pip install pytest pyfakefs
-- pip install .
-script: pytest
+- '3.8'
+install: pip install tox-travis pre-commit poetry
+env:
+  global:
+  - secure: iCK2XVegBPAsOfMCv+X2oLweZNnwK9Yx0o1fm14R41tHmrn7b3uJQIf951S5Ga9q3tyUXcOgTf+fYMm/llFFu+UIygNBPK/pawkcGy5ipf9CrFD3unSjHpM0HAqnHsfNWhCZU8bfgripYukJ3Ib9ZO9QfayK2Vpx2XzUsuFi0AIfslmp4FyVp0xiqfX8u0RylGbuvzGtojJltcmO58tBPOlzyky5Bz9P59eoQ34E8KRisQ3eW4Q8bXHOdqTKc/VnmRyhGDKqkPDk5h0dF57VArByzPnwkyXKArA13J6GoU4tmnsCBBR4m36gvOFyaIH3q3p47n89N75eMCWfIuDdqWplPNuaU4lTnLB353wnqdHMEMltsg/6EG3NJ7Dr8oxenc5Sgy0ohdnUve0TMalkDaw8t3ceN/RgYsr/+8mhb/gFNhGACMKujCDMSRZ5w47E53K4iK4Pz0OdyUZfEjf194RfDU9I+euk+tUvvCZPbpqqvovL5vHhZ8Oo3rKzrVIS35hmtRM/ZgJeFd/2acKbNwp6A+FCNhGFvhD5x2VdHrfKLriv/3gswcxl+Kg6tIFNhKuX63R2lBcFsu7ZuFhlPMZGq/f0McBSU0UTim6t9J18rH8geJszCnwvV9m4z7h2KR6rciXJRMG/Ang7Wo0ww5D7lJrLcF3KYm1hCtcnQnA=
+  - secure: EbeYbq0a9eD/T3PyU5aH8kcvKds7LiW6/PRrLtoWc8EajZDenBoGKDkKO8XQettxUePCRoUQeHqoWMkhQq7QJdx25bNhd5/0NOoGV30jIq6c9TTMIrN4Db0sguccN6t2paWEt3wjw9ferxmX06eydBzTYmyPgdJWas+IEZj5ihsiVjYQDFKEKe/Hnj5zsv+n8yk+YlnTXwT84DhvHNDhf7KYYjcocnuAsF4G2M6GtZMSiQBz8/BV0AaX4nw0SJLVN0vQCTcRY2HNrPXxKG1VveV6ufbjLB1/m345kHj/u9PW88w0h/P4LWfpOLGPdUwBhLj+mW/agNInjYEwQqiEolzuEms5BlLC4NqzGEa9sha2mGsLBD+wFJs3HdquMcX7bUirKCy82VJPmZHA33kRkXORSLPLMEI1WBKFDnE+B0CvH6EDw2SFJm5MrtiO5thtoAmmq1veQJgXCI4sL1b56cWOrni4Ltr5qhGbSUyncl7qDBjmppm5ZWuBsCw+FFqlt2sBIq9FLd9N7ENyHX5CTFL+2UEq1dw1JDkH7RPfNdf6OUu+UaBchaLY5HNMHTIEP+7/ak2Bbq/kOmnZlNnsGdCixmfMGVdkhvo+SxHlPlKpHbsGvFXPldEhGNUp5Y6NJUzeOACje+KW8tBum/f1ACG5ybuYG6KwylF20SCLx1I=
+
+script:
+- pre-commit run --all-files
+- tox
+
 deploy:
-  provider: pypi
-  user: cmehay
-  password:
-    secure: DNYBGvoXcxRNu2mIH4GKvazD6IxkW21ftkihGGFEzll3g1nWV36KPqgZ+2kHN3V69IipI2qe8sa5K3ilZUnNS+WqUU1DdOGzyZq14TPc7tpR1XvVRJokVBEYxTSfnHck7qKvUUcg/7aHNtHR7Fn97l89XvoMiUancCZ6goHHH8R5JfphvF/jg/211Xzl5iRHwGrWDadQCpvxf2PA7yxiUmqglVqbCRu2oox694yS70m2zjr7CNpG7KeRUAWBL1qxM9fnUtlKt3XQ5eGwGuO99f2pmFDPPPHoLyzh9OB1Lue27JWqEotJcS3xTEHg9MhQzWKDYjnUNOX0O7xt7WkakLzkWppZG6SCBrb3Pq7Mimg18T7pCfjwg7TIYqbKiJjiYwg9sIU++wxxMVCHL0fTz8Dbx79L7APR03pVm7mk7GJflSEU2/daMip/SpiBEahLjkpY0573c0RidxY0iHfM+anUMJCVjtHhPcA7jHaupeb7CdHjttFT70aOfUVeHxNk/Y8RWvTJY2pb9lUiigCzyALoy08VRc8OruduLwTYqHZ0zacR0142UrtS1GqiueSyTxRQ0BxA5q2ktfg8jGkp73vvejV19C+B3WiEMtlu4wEQr50lHeQnQc1e+7UcHTiS0vicdaEMexWEADa+v4JDr5epOKRAZ7YIztYr0zJ+TUI=
+- provider: script
+  before_script:
+    - poetry config pypi-token.pypi $PYPI_PASS
+  script: poetry publish --build
   on:
+    repo: cmehay/pytor
+    branch: master
+    python: '3.8'
     tags: true

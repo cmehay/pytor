@@ -38,4 +38,4 @@ hs_ed25519_public_key:
 PT0gZWQyNTUxOXYxLXB1YmxpYzogdHlwZTAgPT0AAAAOA7Co9kaEIMRTlBTrCU+qtzcrfjEGPJuL0z2G+ZG3tQ==
 ```
 
-(more doc soon, I'm tired right mow ~)
+(more doc soon, I'm tired right now ~)
