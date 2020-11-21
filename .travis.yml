@@ -13,10 +13,11 @@ script:
 - pre-commit run --all-files
 - tox
 
+before_deploy:
+- poetry config pypi-token.pypi $PYPI_PASS
+
 deploy:
 - provider: script
-  before_script:
-    - poetry config pypi-token.pypi $PYPI_PASS
   script: poetry publish --build
   on:
     repo: cmehay/pytor
