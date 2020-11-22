@@ -10,7 +10,7 @@ repository = "https://pypi.org/project/pytor/"
 authors = ["Christophe Mehay <cmehay@nospam.student.42.fr>"]
 
 [tool.poetry.dependencies]
-python = ">= 3.6, < 3.9"
+python = ">= 3.6.12, < 3.9"
 pycryptodome = ">=3.9.4"
 fire = ">=0.3.1"
 pyyaml = ">=5.3.1"
@@ -18,7 +18,7 @@ pyyaml = ">=5.3.1"
 [tool.poetry.dev-dependencies]
 numpy = "*"
 tox = "*"
-pre-commit = "*"
+pre-commit = ">=2.8.2"
 ptpython = "*"
 pylama = "*"
 pylint = "*"
