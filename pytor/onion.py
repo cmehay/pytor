@@ -43,6 +43,7 @@ class Onion(ABC):
     _pub_key_filename = None
     _host_filename = None
     _version = None
+    _master_address = None
 
     def __init__(
         self, private_key: bytes = None, hidden_service_path: str = None
@@ -72,6 +73,10 @@ class Onion(ABC):
     def set_private_key(self, key: bytes) -> None:
         "Add private key"
         ...
+
+    def set_master_address(self, address: str) -> None:
+        "Set master address (OnionBalance)"
+        self._master_address = address
 
     @abstractmethod
     def _save_keypair(self, key) -> None:
@@ -113,6 +118,9 @@ class Onion(ABC):
             f.write(self._get_private_key_has_native())
         with open(os.path.join(path, self._host_filename), "w") as f:
             f.write(self.onion_hostname)
+        if self._master_address:
+            with open(os.path.join(path, "ob_config"), "w") as f:
+                f.write(self.get_ob_config())
 
     def get_available_private_key_formats(self) -> list:
         "Get private key export availables formats"
@@ -130,6 +138,9 @@ class Onion(ABC):
         if not hasattr(self, method) and not callable(getattr(self, method)):
             raise NotImplementedError("Method {method} if not implemented")
         return getattr(self, method)()
+
+    def get_ob_config(self):
+        return "MasterOnionAddress {}".format(self._master_address)
 
     @abstractmethod
     def _get_private_key_has_native(self) -> bytes:
@@ -154,6 +165,10 @@ class Onion(ABC):
     @property
     def version(self) -> str:
         return str(self._version)
+
+    @property
+    def master_address(self) -> str:
+        return (self._master_address)
 
 
 class OnionV2(Onion):

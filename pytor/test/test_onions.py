@@ -19,6 +19,7 @@ class _testOnion:
         "priv": "get_private_key",
         "pub": "get_public_key",
         "onion": "onion_hostname",
+        "ob_config": "get_ob_config",
     }
 
     def generate_new_key(self):
@@ -81,6 +82,13 @@ class _testOnion:
         assert d.join(self.files["priv"]).read_binary() == o.get_private_key()
         assert d.join(self.files["onion"]).read() == o.onion_hostname
 
+    def test_import_hidden_directory_with_ob_config(self, tmpdir):
+        d = tmpdir.mkdir("hidden_directory")
+        o = self.onion_cls(hidden_service_path=d, private_key=self.private_key)
+        o.set_master_address("juhu5cebdr4jlv33puderf7ow7air7ilo6ulcwrflkz5w6ttkxghnfad.onion")
+        o.write_hidden_service()
+        assert d.join(self.files["ob_config"]).read() == o.get_ob_config()
+
     def test_version(self):
         assert self.onion_cls().version == str(self.version)
 
@@ -118,6 +126,7 @@ Ch5OTBuvMLzQ8W0yDwIDAQAB
     files = {
         "priv": "private_key",
         "onion": "hostname",
+        "ob_config": "ob_config",
     }
 
     version = 2
@@ -148,5 +157,6 @@ m9/hW13isA==
         "priv": "hs_ed25519_secret_key",
         "pub": "hs_ed25519_public_key",
         "onion": "hostname",
+        "ob_config": "ob_config",
     }
     version = 3
