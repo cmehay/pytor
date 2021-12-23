@@ -2,8 +2,24 @@
 
 `pytor` is a simple python library to create and manager tor hidden services in version 2 and 3.
 
+
+```
+$ mkdir test
+$ pytor new-hidden-service test
+FYI: Binary data is base64 encoded
+path:
+test
+hostname:
+byb3bkhwi2ccbrctsqkowckpvk3tok36geddzg4l2m6yn6mrw626nqid.onion
+hs_ed25519_secret_key:
+PT0gZWQyNTUxOXYxLXNlY3JldDogdHlwZTAgPT0AAAAwIFsWaVtOk8r3RvXnkZcmxwIaDmmOdV8D7KaVf6yBWjVUIUTPpOWNQ9+hEiPKUclJ1RpflZ9FSdPgSj0j0tE3
+hs_ed25519_public_key:
+PT0gZWQyNTUxOXYxLXB1YmxpYzogdHlwZTAgPT0AAAAOA7Co9kaEIMRTlBTrCU+qtzcrfjEGPJuL0z2G+ZG3tQ==
+```
+
+Version 2 is is not working anymore on tor network but the toll can still created ones
 ```sh
-$ pytor new
+$ pytor new --version 2
 hostname:
 cljfodghi4w5frc6.onion
 private_key:
@@ -23,19 +39,3 @@ rboGe61UTI+Ks8Q8kV7/urSI8imNkwHSUT8cMHiLs/IxBOM/p0KvVOa/OQJAHlXY
 w96jWD0AEePqKKdWofLImi074zMSyMKuu6RFrkBSUuI=
 -----END RSA PRIVATE KEY-----
 ```
-
-```
-$ mkdir test
-$ pytor new-hidden-service test --version 3
-FYI: Binary data is base64 encoded
-path:
-test
-hostname:
-byb3bkhwi2ccbrctsqkowckpvk3tok36geddzg4l2m6yn6mrw626nqid.onion
-hs_ed25519_secret_key:
-PT0gZWQyNTUxOXYxLXNlY3JldDogdHlwZTAgPT0AAAAwIFsWaVtOk8r3RvXnkZcmxwIaDmmOdV8D7KaVf6yBWjVUIUTPpOWNQ9+hEiPKUclJ1RpflZ9FSdPgSj0j0tE3
-hs_ed25519_public_key:
-PT0gZWQyNTUxOXYxLXB1YmxpYzogdHlwZTAgPT0AAAAOA7Co9kaEIMRTlBTrCU+qtzcrfjEGPJuL0z2G+ZG3tQ==
-```
-
-(more doc soon, I'm tired right now ~)
