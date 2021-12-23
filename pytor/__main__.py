@@ -38,7 +38,7 @@ class Pytor(object):
         3: OnionV3,
     }
 
-    def __init__(self, version: int = 2, format: str = "plain"):
+    def __init__(self, version: int = 3, format: str = "plain"):
         if version not in self._obj:
             raise Exception("Onion version not valid")
         self._version = version

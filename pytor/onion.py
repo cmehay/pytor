@@ -1,5 +1,6 @@
 import os
 import re
+import warnings
 from abc import ABC
 from abc import abstractmethod
 from base64 import b32encode
@@ -47,6 +48,11 @@ class Onion(ABC):
     def __init__(
         self, private_key: bytes = None, hidden_service_path: str = None
     ):
+        if self._version == 2:
+            warnings.warn(
+            "Onion addresses version 2 are not supported anymore by tor",
+            UserWarning
+        )
 
         if hidden_service_path:
             try:
