@@ -1,7 +1,7 @@
 [tool]
 [tool.poetry]
 name = "pytor"
-version = "0.1.8"
+version = "0.1.9"
 description = "Manage Tor hidden services keys"
 license = "WTFPL"
 classifiers = ["Programming Language :: Python", "Development Status :: 1 - Planning", "License :: OSI Approved :: BSD License", "Natural Language :: English", "Operating System :: POSIX :: Linux", "Programming Language :: Python :: 3", "Programming Language :: Python :: 3.6", "Programming Language :: Python :: 3.7"]
@@ -10,7 +10,7 @@ repository = "https://pypi.org/project/pytor/"
 authors = ["Christophe Mehay <cmehay@nospam.student.42.fr>"]
 
 [tool.poetry.dependencies]
-python = ">= 3.6.12, < 3.10"
+python = ">= 3.6.12, < 3.11"
 pycryptodome = ">=3.9.4"
 fire = ">=0.3.1"
 pyyaml = ">=5.3.1"
